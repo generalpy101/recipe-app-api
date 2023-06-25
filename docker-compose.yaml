@@ -1,6 +1,16 @@
 version: "3.9"
 
 services:
+  db:
+    image: postgres:13-alpine
+    volumes:
+      - dev-db-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+  # DB credentials are default for dev, change in prod
+
   app:
     build:
       context: .
@@ -12,4 +22,16 @@ services:
       - ./app:/app
     command: >
       sh -c "python manage.py runserver 0.0.0.0:8000"
+    environment:
+      - DB_HOST=db
+      - DB_NAME=postgres
+      - DB_USER=postgres
+      - DB_PASS=postgres
+    depends_on:
+      - db
+  
+volumes:
+  dev-db-data:
+  
+# If nothing after the colon, named volume is stored at default location of docker
 # https://www.baeldung.com/ops/docker-volumes Docker volumes guide
